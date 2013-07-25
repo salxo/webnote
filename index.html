@@ -1,61 +1,61 @@
 <!DOCTYPE html>
-<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
 <title>Notepad · v 0.1</title>
 
 
-	<link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/foundation.css">
+
+<script src="js/cd.js"></script>
+  <script src="js/vendor/custom.modernizr.js"></script>
 
 
-	<script src="js/vendor/custom.modernizr.js"></script>
+  <style type="text/css">
+  #e{
+    font-size: 16px;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    min-height:600px;
+    height:100%;
+    margin-top: 45px;
+    line-height: 20px;
+    margin-bottom: -45px;
+  }
+  #status {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 15px 30px;
+  }
+  .flex-editor {
+    padding-top: 1.5625em;
+    padding-bottom: 67.5%;
+    height: 0;
+    margin-bottom: 1em;
+    overflow: hidden;
+  }
+  body
+  {
+    position:static;
+    margin-bottom: -40px;
 
-
-	<style type="text/css">
-	#e{
-		font-size: 16px;
-		position:absolute;
-		top:0;
-		right:0;
-		bottom:0;
-		left:0;
-		min-height:600px;
-		height:100%;
-		margin-top: 45px;
-		line-height: 20px;
-		margin-bottom: -45px;
-	}
-	#status {
-		position: absolute;
-		top: 0;
-		right: 0;
-		padding: 15px 30px;
-	}
-	.flex-editor {
-		padding-top: 1.5625em;
-		padding-bottom: 67.5%;
-		height: 0;
-		margin-bottom: 1em;
-		overflow: hidden;
-	}
-	body
-	{
-		position:static;
-		margin-bottom: -40px;
-
-	}
-	body,html 
-	{
-		background-color: #333;
-	}
-	</style>
-	<!-- include the core styles -->
-	<link rel="stylesheet" href="alertify.core.css" />
-	<!-- include a theme, can be included into the core instead of 2 separate files -->
-	<link rel="stylesheet" href="alertify.bootstrap.css" />
+  }
+  body,html 
+  {
+    background-color: #333;
+  }
+  </style>
+  <!-- include the core styles -->
+  <link rel="stylesheet" href="alertify.core.css" />
+  <!-- include a theme, can be included into the core instead of 2 separate files -->
+  <link rel="stylesheet" href="alertify.bootstrap.css" />
 
 </head>
 <body>
@@ -74,16 +74,16 @@
     <ul class="left">
       <li><a href="#" id="save">Descargar</a></li>
       <li class="divider"></li>
-		<li><a href="#" id="redo">Rendo</a></li>
-		<li><a href="#" id="undo">Undo</a></li>
+    <li><a href="#" id="redo">Rendo</a></li>
+    <li><a href="#" id="undo">Undo</a></li>
 
-		<li class="has-form">
+    <li class="has-form">
         <form class="custom">
 
 </form>
       
 
-		</li>
+    </li>
       <li class="divider"></li>
       <li class="has-form">
         <form>
@@ -195,96 +195,202 @@
   </section>
 </nav>
 
-			<div id="e"></div>
+      <div id="e"></div>
 
 
 <div id="status" class="label">Sin Guardar</div>
 
+<div id="myModal" class="reveal-modal">
+  <h2>Bienvenido a WebNote</h2>
+  <p>A continuación ingresá el nombre de tu primer archivo</p>
+  <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
+  <a class="button" id="createFile">Crear mi perimer WebNote</a>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="fileList" class="reveal-modal">
+  <h2>Seleccionà uno de tus archivos para editar</h2>
+  <ul id="list" class="inline-list"> </ul>
+  <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
+  <a class="button" id="createFile">Crear mi perimer WebNote</a>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="alertify.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="js/fs.min.js"></script>
+
 <script>
-	var e,
-		aceSection,
-		statusContent;
-
-	e=ace.edit("e");
-	e.setTheme("ace/theme/monokai");
-	e.getSession().setMode("ace/mode/javascript");
-	
-	aceSection = localStorage.getItem('aceSection');
-	statusContent = $('#status');
-
-	if(aceSection && aceSection.length > 0)
-	{
-		e.setValue(aceSection);
-		statusContent.text('Sin cambios');
-
-	}
-	
+$(document).ready(
+  function(){
 
 
-	var save = function(){ 
 
-		if(!e.getValue() || !localStorage.getItem('aceSection') || e.getValue().length != localStorage.getItem('aceSection').length)
-		{
 
-			statusContent.text('Guardando...')
-			statusContent.removeClass('success');
-			
-			try {
-			  localStorage.setItem('aceSection', e.getValue());
-			} catch(e) {
-			  if(e.name === 'QUOTA_EXCEEDED_ERR') {
-			    	statusContent.text('No hay mas espacio para guardar')
-			    	statusContent.addClass('error');
-			  } else {
-			    module.localStorageAvailable = false;
-			    statusContent.text('NO SE PUEDE GUARDAR')
-			    console.error("Error al guardar en local storage - " + e);
-			  }
-			}
 
-	//		alertify.success("All saved"+ Date());
-			statusContent.text('Guardado')
-			statusContent.addClass('success');
+    //var FileSystem = new CD('/');
 
-		}
-		else
-		{
 
-		}
-		
-	};
 
-	e.getSession().on('change', function(){
+    var e,
+    aceSection,
+    statusContent;
 
-			statusContent.text('Sin guardar');
-			save();
-	});
+    e=ace.edit("e");
+    e.setTheme("ace/theme/monokai");
+    e.getSession().setMode("ace/mode/javascript");
+    
+    aceSection = localStorage.getItem('aceSection');
+    statusContent = $('#status');
 
-	$('#save').click(function(){
-		save();
+    aceSection = {
+      name: '',
+      content: ''
+    };
+    statusContent = $('#status');
 
-		var blob = new Blob([localStorage.getItem('aceSection')], {type: "text/plain;charset=utf-8"});
-		
-		var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
-			//Detectar el tipo de archivo.
-		saveAs(blob, fileName);
 
-	})
 
-	$('#undo').click(function(){
-		e.undo();
-	})
+  /*
+  if(aceSection && aceSection.length > 0)
+  {
+    e.setValue(aceSection);
+    statusContent.text('Sin cambios');
+  }
+  else
+  {
+    */
 
-	$('#redo').click(function(){
-		e.redo();
-	})
-	
-	$('#languageSelect').change(function(){
-		e.getSession().setMode("ace/mode/"+$(this).val());
-	})
+
+    setTimeout(function(){
+
+
+  
+    var files = [];
+    // Si no hay ningun archivo creado
+
+
+   cd('/').for('*',function(done,file) { 
+              files.push(file);
+   }).then(function(){
+
+
+    if(files.length < 1)
+    {
+      $('#myModal').foundation('reveal', 'open'); 
+
+      $('#createFile').click(function(){
+        var fileName = $('#newFileInput').val();
+        cd('/').write(fileName,'');
+        $('#myModal').foundation('reveal', 'close'); 
+      });
+    }
+    else
+    {
+      $.each(files, function(){
+        $('#fileList > #list').append('<li class=""><a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+ this.name +'</a></li>');
+      })
+      $('#fileList').foundation('reveal', 'open');
+      $('.openFile').click(function(){
+
+        aceSection.name = $(this).attr('name');
+        cd('/').read( $(this).attr('name'), function(done,res) { 
+          //this
+         // .echo(res)
+         // .write('report.txt', 'bar.txt contains '+res);
+         aceSection.content = res;
+            e.setValue(aceSection.content);
+            $('#fileList').foundation('reveal', 'close');
+
+        })
+
+      })
+
+    }
+
+  });
+
+
+
+    },2000)
+    //Busco los archivos creados y los meto en un array
+
+
+
+
+
+
+
+/*
+   
+
+  }
+  */
+
+  /* Methods */
+  save = function(){ 
+
+      statusContent.text('Guardando...')
+      statusContent.removeClass('success');
+      aceSection.content =e.getValue();
+
+      try {
+        //localStorage.setItem('aceSection', e.getValue());
+      cd('/').write(aceSection.name,aceSection.content);
+
+      } catch(e) {
+        if(e.name === 'QUOTA_EXCEEDED_ERR') {
+            statusContent.text('No hay mas espacio para guardar')
+            statusContent.addClass('error');
+        } else {
+          module.localStorageAvailable = false;
+          statusContent.text('NO SE PUEDE GUARDAR')
+          console.error("Error al guardar en local storage - " + e);
+        }
+      }
+
+
+      statusContent.text('Guardado')
+      statusContent.addClass('success');
+
+  };
+
+
+
+
+  /* Event bind */
+
+  e.getSession().on('change', function(){
+      statusContent.text('Sin guardar');
+      save();
+  });
+
+  $('#save').click(function(){
+    save();
+
+    var blob = new Blob([localStorage.getItem('aceSection')], {type: "text/plain;charset=utf-8"});
+    var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
+    //TODO: Detectar el tipo de archivo.
+    saveAs(blob, fileName);
+  })
+
+  $('#undo').click(function(){
+      e.undo();
+  })
+
+  $('#redo').click(function(){
+      e.redo();
+  })
+  
+  $('#languageSelect').change(function(){
+    e.getSession().setMode("ace/mode/"+$(this).val());
+  })
+
+});
+
 
 </script>
 
@@ -294,11 +400,12 @@
   '.js><\/script>')
   </script>
   
-  <script src="js/fs.min.js"></script>
+
   <script src="js/foundation.min.js"></script>
-    <script src="js/foundation/foundation.forms.js"></script>
-      <script src="js/foundation/foundation.topbar.js"></script>
-        <script src="js/foundation/foundation.dropdown.js"></script>
+  <script src="js/foundation/foundation.forms.js"></script>
+  <script src="js/foundation/foundation.topbar.js"></script>
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  <script src="js/foundation/foundation.reveal.js"></script>
   <!--
   
   <script src="js/foundation/foundation.js"></script>
