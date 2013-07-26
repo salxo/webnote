@@ -1,4 +1,4 @@
-ebNote V 0.5
+WebNote V 0.5
 ================================
 Una simple pero poderosa aplicación para la edición de archivos JavaScript, HTML, CSS, Ruby, etc..  de tu navegador.
 
