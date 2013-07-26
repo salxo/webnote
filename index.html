@@ -73,6 +73,8 @@
     <!-- Left Nav Section -->
     <ul class="left">
       <li><a href="#" id="save">Descargar</a></li>
+      <li><a href="#" id="new">Nuevo</a></li>
+      <li><a href="#" id="select">Elegir archivo</a></li>
       <li class="divider"></li>
     <li><a href="#" id="redo">Rendo</a></li>
     <li><a href="#" id="undo">Undo</a></li>
@@ -204,15 +206,13 @@
   <h2>Bienvenido a WebNote</h2>
   <p>A continuación ingresá el nombre de tu primer archivo</p>
   <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
-  <a class="button" id="createFile">Crear mi perimer WebNote</a>
+  <a class="button" id="createFile">Crear WebNote</a>
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
 <div id="fileList" class="reveal-modal">
   <h2>Seleccionà uno de tus archivos para editar</h2>
   <ul id="list" class="inline-list"> </ul>
-  <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
-  <a class="button" id="createFile">Crear mi perimer WebNote</a>
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
@@ -254,64 +254,34 @@ $(document).ready(
 
 
 
-  /*
-  if(aceSection && aceSection.length > 0)
-  {
-    e.setValue(aceSection);
-    statusContent.text('Sin cambios');
-  }
-  else
-  {
-    */
+    files = [];
+refreshFileList = function(callback)
+{
+  cb = callback;
+  files=[];
+  cd('/').for('*',function(done,file) { 
+      files.push(file);
+  }).then(function(){
+      if(cb && typeof cb == 'function')
+      {
+        cb();
+      }
+  })
+}
 
-
-    setTimeout(function(){
-
-
-  
-    var files = [];
-    // Si no hay ningun archivo creado
-
-
-   cd('/').for('*',function(done,file) { 
-              files.push(file);
-   }).then(function(){
-
-
-    if(files.length < 1)
-    {
-      $('#myModal').foundation('reveal', 'open'); 
-
-      $('#createFile').click(function(){
-        var fileName = $('#newFileInput').val();
-        cd('/').write(fileName,'');
-        $('#myModal').foundation('reveal', 'close'); 
+  setTimeout(function(){
+      refreshFileList(function(){
+            if(files.length < 1)
+            {
+                cleateFile();
+                // alert('createFile');
+            }
+            else
+            {
+                selectFile(files);
+                // alert('selectFile');
+            }
       });
-    }
-    else
-    {
-      $.each(files, function(){
-        $('#fileList > #list').append('<li class=""><a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+ this.name +'</a></li>');
-      })
-      $('#fileList').foundation('reveal', 'open');
-      $('.openFile').click(function(){
-
-        aceSection.name = $(this).attr('name');
-        cd('/').read( $(this).attr('name'), function(done,res) { 
-          //this
-         // .echo(res)
-         // .write('report.txt', 'bar.txt contains '+res);
-         aceSection.content = res;
-            e.setValue(aceSection.content);
-            $('#fileList').foundation('reveal', 'close');
-
-        })
-
-      })
-
-    }
-
-  });
 
 
 
@@ -331,15 +301,62 @@ $(document).ready(
   */
 
   /* Methods */
+
+createFile = function()
+{
+      
+
+      $('#myModal').foundation('reveal', 'open'); 
+
+      $('#createFile').click(function(){
+          aceSection.name = $('#newFileInput').val();
+          aceSection.content = '';
+          cd('/').write(aceSection.name ,aceSection.content);
+
+          e.setValue(aceSection.content);
+
+          $('#myModal').foundation('reveal', 'close'); 
+      });
+
+}
+
+selectFile = function(files)
+{
+      $('#fileList > #list').html('');
+      $.each(files, function(){
+        $('#fileList > #list').append('<li class=""><a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+ this.name +'</a></li>');
+      })
+      $('#fileList').foundation('reveal', 'open');
+      $('.openFile').click(function(){
+
+        aceSection.name = $(this).attr('name');
+        cd('/').read( $(this).attr('name'), function(done,res) { 
+          //this
+         // .echo(res)
+         // .write('report.txt', 'bar.txt contains '+res);
+         aceSection.content = res;
+            e.setValue(aceSection.content);
+            $('#fileList').foundation('reveal', 'close');
+
+        })
+
+      })
+}
+
+
   save = function(){ 
 
       statusContent.text('Guardando...')
       statusContent.removeClass('success');
-      aceSection.content =e.getValue();
+      aceSection.content = e.getValue();
 
       try {
         //localStorage.setItem('aceSection', e.getValue());
-      cd('/').write(aceSection.name,aceSection.content);
+      cd('/').write(aceSection.name,aceSection.content).then(function(){
+
+                statusContent.text('Guardado')
+                statusContent.addClass('success');
+      });
 
       } catch(e) {
         if(e.name === 'QUOTA_EXCEEDED_ERR') {
@@ -353,8 +370,7 @@ $(document).ready(
       }
 
 
-      statusContent.text('Guardado')
-      statusContent.addClass('success');
+
 
   };
 
@@ -371,10 +387,10 @@ $(document).ready(
   $('#save').click(function(){
     save();
 
-    var blob = new Blob([localStorage.getItem('aceSection')], {type: "text/plain;charset=utf-8"});
-    var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
+    var blob = new Blob([aceSection.content], {type: "text/plain;charset=utf-8"});
+    //var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
     //TODO: Detectar el tipo de archivo.
-    saveAs(blob, fileName);
+    saveAs(blob, aceSection.name);
   })
 
   $('#undo').click(function(){
@@ -385,6 +401,14 @@ $(document).ready(
       e.redo();
   })
   
+
+  $('#new').click(function(){
+      createFile();
+  })
+
+  $('#select').click(function(){
+      refreshFileList(selectFile(files));
+  })
   $('#languageSelect').change(function(){
     e.getSession().setMode("ace/mode/"+$(this).val());
   })
