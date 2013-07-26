@@ -45,11 +45,15 @@
   {
     position:static;
     margin-bottom: -40px;
+    font-family: Helvetica, Arial, san-serif;
 
   }
   body,html 
   {
     background-color: #333;
+  }
+  p {
+      text-rendering:  optimizeSpeed;
   }
   </style>
   <!-- include the core styles -->
@@ -72,12 +76,12 @@
   <section class="top-bar-section">
     <!-- Left Nav Section -->
     <ul class="left">
-      <li><a href="#" id="save">Descargar</a></li>
-      <li><a href="#" id="new">Nuevo</a></li>
-      <li><a href="#" id="select">Elegir archivo</a></li>
+      <li><a href="#" id="select">Mis archivos</a></li>
+      <li><a href="#" id="new">Crear archivo</a></li>
+      <li><a href="#" id="save">Exportar</a></li>
       <li class="divider"></li>
-    <li><a href="#" id="redo">Rendo</a></li>
-    <li><a href="#" id="undo">Undo</a></li>
+      <li><a href="#" id="undo" title="Ctrl + Z">Deshacer</a></li>
+      <li><a href="#" id="redo" title="Ctrl + Shift + Z">Rehacer</a></li>
 
     <li class="has-form">
         <form class="custom">
@@ -203,7 +207,7 @@
 <div id="status" class="label">Sin Guardar</div>
 
 <div id="myModal" class="reveal-modal">
-  <h2>Bienvenido a WebNote</h2>
+  <h3>Crear un archivo</h3>
   <p>A continuación ingresá el nombre de tu primer archivo</p>
   <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
   <a class="button" id="createFile">Crear WebNote</a>
@@ -211,7 +215,8 @@
 </div>
 
 <div id="fileList" class="reveal-modal">
-  <h2>Seleccionà uno de tus archivos para editar</h2>
+  <h3>Mis archivos</h3>
+  <p>Administra y seleciona tus archivos para la edicion desde aquí</p>
   <ul id="list" class="inline-list"> </ul>
   <a class="close-reveal-modal">&#215;</a>
 </div>
@@ -254,14 +259,15 @@ $(document).ready(
 
 
 
-    files = [];
+    _GlobalFiles = [];
 refreshFileList = function(callback)
 {
   cb = callback;
-  files=[];
+  _GlobalFiles=[];
   cd('/').for('*',function(done,file) { 
-      files.push(file);
+      _GlobalFiles.push(file);
   }).then(function(){
+    console.log('_GlobalFiles:', _GlobalFiles)
       if(cb && typeof cb == 'function')
       {
         cb();
@@ -271,25 +277,26 @@ refreshFileList = function(callback)
 
   setTimeout(function(){
       refreshFileList(function(){
-            if(files.length < 1)
+            if(_GlobalFiles.length < 1)
             {
-                cleateFile();
-                // alert('createFile');
+                createFile();
             }
             else
             {
-                selectFile(files);
-                // alert('selectFile');
+                selectFile();
             }
       });
-
-
 
     },2000)
     //Busco los archivos creados y los meto en un array
 
 
 
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+             .toString(16)
+             .substring(1);
+};
 
 
 
@@ -309,10 +316,15 @@ createFile = function()
       $('#myModal').foundation('reveal', 'open'); 
 
       $('#createFile').click(function(){
+          // SI es un archivo sin nombre que se inenta guardar no le borro el contenido
+          if(aceSection.name == '' && aceSection.content != '');
+          {
+              aceSection.content = '';
+          }
+        
           aceSection.name = $('#newFileInput').val();
-          aceSection.content = '';
+        
           cd('/').write(aceSection.name ,aceSection.content);
-
           e.setValue(aceSection.content);
 
           $('#myModal').foundation('reveal', 'close'); 
@@ -320,56 +332,99 @@ createFile = function()
 
 }
 
-selectFile = function(files)
+selectFile = function()
 {
-      $('#fileList > #list').html('');
-      $.each(files, function(){
-        $('#fileList > #list').append('<li class=""><a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+ this.name +'</a></li>');
-      })
-      $('#fileList').foundation('reveal', 'open');
-      $('.openFile').click(function(){
+     
+      if(_GlobalFiles && _GlobalFiles.length > 0)
+      {
 
-        aceSection.name = $(this).attr('name');
-        cd('/').read( $(this).attr('name'), function(done,res) { 
-          //this
-         // .echo(res)
-         // .write('report.txt', 'bar.txt contains '+res);
-         aceSection.content = res;
-            e.setValue(aceSection.content);
-            $('#fileList').foundation('reveal', 'close');
+         $('#fileList > #list').html('');
+      
+        $.each(_GlobalFiles, function(){
+
+          var uid= s4();
+
+          $('#fileList > #list').append('<li class="panel">'+
+            '<a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+
+              '<h4>'+ this.name +'</h4>'+
+            '</a>'+
+            '<ul class="button-group round ">'+
+              '<li><a href="#"  name="'+this.name+'" class="small button openFile">Seleccionar</a></li>'+
+              '<li><a href="#" class="small button alert deleteFile" name="'+this.name+'" data-tooltip class="has-tip tip-right" title="Eliminar archivo">&#215;</a></li>'+
+            '</ul>'+
+            '<div id="drop'+uid+'" class="f-dropdown tiny content" data-dropdown-content>'+
+                '<h5>¿Seguro?<h5>'+
+                  '<ul class="button-group tiny">'+
+                      '<li><a href="#" class="button tiny secondary close-dropdown">Cancelar</a></li>'+
+                      '<li><a href="#" class="button tiny deleteFile" name="'+this.name+'">Eliminarlo</a></li>'+
+                  '</ul>'+
+            '</div>'+
+            '<a class="close-reveal-modal">&#215;</a>'+
+          '</li>');
+        })
+
+
+
+
+        $('#fileList').foundation('reveal', 'open');
+        $('.openFile').click(function(){
+
+          aceSection.name = $(this).attr('name');
+          cd('/').read( $(this).attr('name'), function(done,res) { 
+            //this
+           // .echo(res)
+           // .write('report.txt', 'bar.txt contains '+res);
+           aceSection.content = res;
+              e.setValue(aceSection.content);
+              $('#fileList').foundation('reveal', 'close');
+
+          })
 
         })
 
-      })
+      }
+      else
+      {
+        createFile();
+      }
 }
 
 
   save = function(){ 
 
-      statusContent.text('Guardando...')
-      statusContent.removeClass('success');
       aceSection.content = e.getValue();
 
-      try {
-        //localStorage.setItem('aceSection', e.getValue());
-      cd('/').write(aceSection.name,aceSection.content).then(function(){
+      if(!aceSection.name || aceSection.name == "")
+      {
+          createFile();
+      }
+      else
+      {
+          statusContent.text('Guardando...')
+          statusContent.removeClass('success');
 
-                statusContent.text('Guardado')
-                statusContent.addClass('success');
-      });
+          try {
+              //localStorage.setItem('aceSection', e.getValue());
+            cd('/').write(aceSection.name,aceSection.content).then(function(){
 
-      } catch(e) {
-        if(e.name === 'QUOTA_EXCEEDED_ERR') {
-            statusContent.text('No hay mas espacio para guardar')
-            statusContent.addClass('error');
-        } else {
-          module.localStorageAvailable = false;
-          statusContent.text('NO SE PUEDE GUARDAR')
-          console.error("Error al guardar en local storage - " + e);
-        }
+                      statusContent.text('Guardado')
+                      statusContent.addClass('success');
+            });
+
+          } catch(e) {
+            if(e.name === 'QUOTA_EXCEEDED_ERR') {
+                statusContent.text('No hay mas espacio para guardar')
+                statusContent.addClass('error');
+            } else {
+              module.localStorageAvailable = false;
+              statusContent.text('NO SE PUEDE GUARDAR')
+              console.error("Error al guardar en local storage - " + e);
+            }
+          }
+
       }
 
-
+      
 
 
   };
@@ -407,8 +462,32 @@ selectFile = function(files)
   })
 
   $('#select').click(function(){
-      refreshFileList(selectFile(files));
+      refreshFileList(selectFile);
   })
+
+  $('body').on('click','.deleteFile', function(){
+        
+        if(confirm('¿Lo eliminamos?'))
+        {
+          cd('/').rm( $(this).attr('name'), function(done,res) {
+             alert('Fallo la eliminación del archivo');
+          }).then(function(){
+              refreshFileList(selectFile);
+          })
+        }
+        
+  });
+
+
+
+  $('body').on('click','.close-dropdown', function(){
+        
+        $('.open').closed();
+
+  });
+
+
+
   $('#languageSelect').change(function(){
     e.getSession().setMode("ace/mode/"+$(this).val());
   })
@@ -430,6 +509,7 @@ selectFile = function(files)
   <script src="js/foundation/foundation.topbar.js"></script>
   <script src="js/foundation/foundation.dropdown.js"></script>
   <script src="js/foundation/foundation.reveal.js"></script>
+  <script src="js/foundation/foundation.dropdown.js"></script>
   <!--
   
   <script src="js/foundation/foundation.js"></script>

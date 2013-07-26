@@ -121,13 +121,13 @@
 
     css : function (dropdown, target) {
       var offset_parent = dropdown.offsetParent();
-      // if (offset_parent.length > 0 && /body/i.test(dropdown.offsetParent()[0].nodeName)) {
+      if (offset_parent.length > 0 && /body/i.test(dropdown.offsetParent()[0].nodeName)) {
         var position = target.offset();
         position.top -= offset_parent.offset().top;
         position.left -= offset_parent.offset().left;
-      // } else {
-      //   var position = target.position();
-      // }
+      } else {
+        var position = target.position();
+      }
 
       if (this.small()) {
         dropdown.css({

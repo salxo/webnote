@@ -1,6 +1,12 @@
-WebNote V 0.5
+﻿WebNote | Version 0.6 (BETA)
 ================================
 Una simple pero poderosa aplicación para la edición de archivos JavaScript, HTML, CSS, Ruby, etc..  de tu navegador.
+
+
+V 0.6 (BETA) Caracteristicas:
+-------------------------
+- Eliminaciòn de archivos
+- Administración completa de arhivos.
 
 
 V 0.5 Caracteristicas:
