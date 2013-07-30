@@ -1,17 +1,28 @@
 <!DOCTYPE html>
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="es" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="es" ng-app ng-controller="wn"> <!--<![endif]-->
 
 <head>
+  <title>Notepad · {{version}}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-<title>Notepad · v 0.1</title>
-
-
+  
+  <!-- Le CSS -->
   <link rel="stylesheet" href="css/foundation.css">
+  <!--link rel="stylesheet" href="css/alertify.core.css" />
+  <link rel="stylesheet" href="css/alertify.bootstrap.css" /-->
 
-<script src="js/cd.js"></script>
+  <!-- Le JavaScipt -->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="js/ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  
   <script src="js/vendor/custom.modernizr.js"></script>
+  <script src="js/cd.js"></script>
+  <!--script src="js/alertify.min.js" type="text/javascript" charset="utf-8"></script-->
+  <script src="js/fs.min.js"></script>
+  <script src="js/webnote.js?v=0.6"></script>
+
 
 
   <style type="text/css">
@@ -56,10 +67,7 @@
       text-rendering:  optimizeSpeed;
   }
   </style>
-  <!-- include the core styles -->
-  <link rel="stylesheet" href="alertify.core.css" />
-  <!-- include a theme, can be included into the core instead of 2 separate files -->
-  <link rel="stylesheet" href="alertify.bootstrap.css" />
+
 
 </head>
 <body>
@@ -67,7 +75,7 @@
   <ul class="title-area">
     <!-- Title Area -->
     <li class="name">
-      <h1><a href="#">Notepad 0.1 BETA</a></h1>
+      <h1><a href="#">Notepad {{version}}</a></h1>
     </li>
     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
     <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
@@ -76,426 +84,76 @@
   <section class="top-bar-section">
     <!-- Left Nav Section -->
     <ul class="left">
-      <li><a href="#" id="select">Mis archivos</a></li>
-      <li><a href="#" id="new">Crear archivo</a></li>
+      <li><a href="#" ng-click="selectFile()">Mis archivos</a></li>
+      <li><a href="#" ng-click="refreshFileList()">(R)</a></li>
+      <li><a href="#" ng-click="openCreate()">Crear archivo</a></li>
       <li><a href="#" id="save">Exportar</a></li>
       <li class="divider"></li>
       <li><a href="#" id="undo" title="Ctrl + Z">Deshacer</a></li>
       <li><a href="#" id="redo" title="Ctrl + Shift + Z">Rehacer</a></li>
 
-    <li class="has-form">
-        <form class="custom">
-
-</form>
-      
-
-    </li>
       <li class="divider"></li>
       <li class="has-form">
         <form>
           <div class="row collapse">
-  <label for="languageSelect">Lenguaje</label>
-  <select id="languageSelect">
-    <option value="javascript">Javascript</option>
-    <option value="css">CSS</option>
-    <option value="html">HTML</option>
-    <option value="ruby">Ruby</option>
-    <option value="sql">SQL</option>
-    <option value="text">Texto</option>
-  </select>
+          <label for="languageSelect">Lenguaje</label>
+          <select id="languageSelect">
+            <option value="javascript">Javascript</option>
+            <option value="css">CSS</option>
+            <option value="html">HTML</option>
+            <option value="ruby">Ruby</option>
+            <option value="sql">SQL</option>
+            <option value="text">Texto</option>
+          </select>
           </div>
         </form>
       </li>
-      <li class="has-dropdown"><a href="#">Main Item 3</a>
-
-        <ul class="dropdown">
-          <li class="has-dropdown"><a href="#">Dropdown Level 1a</a>
-
-            <ul class="dropdown">
-              <li><label>Dropdown Level 2 Label</label></li>
-              <li><a href="#">Dropdown Level 2a</a></li>
-              <li><a href="#">Dropdown Level 2b</a></li>
-              <li class="has-dropdown"><a href="#">Dropdown Level 2c</a>
-
-                <ul class="dropdown">
-                  <li><label>Dropdown Level 3 Label</label></li>
-                  <li><a href="#">Dropdown Level 3a</a></li>
-                  <li><a href="#">Dropdown Level 3b</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#">Dropdown Level 3c</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown Level 2d</a></li>
-              <li><a href="#">Dropdown Level 2e</a></li>
-              <li><a href="#">Dropdown Level 2f</a></li>
-            </ul>
-          </li>
-          <li><a href="#">Dropdown Level 1b</a></li>
-          <li><a href="#">Dropdown Level 1c</a></li>
-          <li class="divider"></li>
-          <li><a href="#">Dropdown Level 1d</a></li>
-          <li><a href="#">Dropdown Level 1e</a></li>
-          <li><a href="#">Dropdown Level 1f</a></li>
-          <li class="divider"></li>
-          <li><a href="#">See all &rarr;</a></li>
-        </ul>
-
-      </li>
-      <li class="divider"></li>
     </ul>
 
-    <!-- Right Nav Section -->
-    <ul class="right">
-      <li class="divider hide-for-small"></li>
-      <li class="has-dropdown"><a href="#">Main Item 4</a>
-
-        <ul class="dropdown">
-          <li><label>Dropdown Level 1 Label</label></li>
-          <li class="has-dropdown"><a href="#" class="">Dropdown Level 1a</a>
-
-            <ul class="dropdown">
-              <li><a href="#">Dropdown Level 2a</a></li>
-              <li><a href="#">Dropdown Level 2b</a></li>
-              <li class="has-dropdown"><a href="#">Dropdown Level 2c</a>
-
-                <ul class="dropdown">
-                  <li><a href="#">Dropdown Level 3a</a></li>
-                  <li><a href="#">Dropdown Level 3b</a></li>
-                  <li><a href="#">Dropdown Level 3c</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown Level 2d</a></li>
-              <li><a href="#">Dropdown Level 2e</a></li>
-              <li><a href="#">Dropdown Level 2f</a></li>
-            </ul>
-          </li>
-          <li><a href="#">Dropdown Level 1b</a></li>
-          <li><a href="#">Dropdown Level 1c</a></li>
-          <li class="divider"></li>
-          <li><label>Dropdown Level 1 Label</label></li>
-          <li><a href="#">Dropdown Level 1d</a></li>
-          <li><a href="#">Dropdown Level 1e</a></li>
-          <li><a href="#">Dropdown Level 1f</a></li>
-          <li class="divider"></li>
-          <li><a href="#">See all &rarr;</a></li>
-        </ul>
-      </li>
-      <li class="divider"></li>
-      <!--li class="has-form">
-        <form>
-          <div class="row collapse">
-            <div class="small-8 columns">
-              <input type="text">
-            </div>
-            <div class="small-4 columns">
-              <a href="#" class="alert button">Search</a>
-            </div>
-          </div>
-        </form>
-      </li>
-      <li class="divider show-for-small"></li>
-      <li class="has-form">
-        <a class="button" href="#">Button!</a>
-      </li-->
-    </ul>
   </section>
 </nav>
 
       <div id="e"></div>
 
 
-<div id="status" class="label">Sin Guardar</div>
+<div id="status" class="label {{statusContent.class}}">{{statusContent.text}}</div>
 
 <div id="myModal" class="reveal-modal">
   <h3>Crear un archivo</h3>
   <p>A continuación ingresá el nombre de tu primer archivo</p>
-  <input type="text" required id="newFileInput" value="new.js" placeholder="EJ: miarchivo.js" />
-  <a class="button" id="createFile">Crear WebNote</a>
+  <input type="text" required id="" ng-model="newFileName" value="" placeholder="EJ: miarchivo.js" />
+  <a class="button" ng-click="createFile()">Crear WebNote</a>
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
 <div id="fileList" class="reveal-modal">
-  <h3>Mis archivos</h3>
+  <h3>Mis archivos</h3> 
+  <a ng-click="refreshFileList()" class="right">Refrescar</a>
+  <a ng-show="debug" ng-click="pushFake()">PushFake</a>
   <p>Administra y seleciona tus archivos para la edicion desde aquí</p>
-  <ul id="list" class="inline-list"> </ul>
+  <ul class="inline-list"> 
+      <li class="panel" ng-repeat="file in filesystem">
+        <a  ng-click="loadFile(file)" name="cosas" title="Abrir y editar {{file.name}}">
+          <h4>{{file.name}}</h4>
+        </a>
+        <ul class="button-group round ">
+          <li>
+            <a href="#" ng-click="loadFile(file)" class="small button">Seleccionar</a>
+          </li>
+          <li>
+            <a ng-click="deleteFile(file)" href="#" class="small button alert" title="Eliminar archivo">×</a>
+          </li>
+        </ul>
+      </li>
+      <li class="panel">
+
+            <a href="#" class="button" ng-click="openCreate()">Crear Nuevo</a>
+ 
+     </li>
+  </ul>
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="alertify.min.js" type="text/javascript" charset="utf-8"></script>
-
-<script src="js/fs.min.js"></script>
-
-<script>
-$(document).ready(
-  function(){
-
-
-
-
-
-    //var FileSystem = new CD('/');
-
-
-
-    var e,
-    aceSection,
-    statusContent;
-
-    e=ace.edit("e");
-    e.setTheme("ace/theme/monokai");
-    e.getSession().setMode("ace/mode/javascript");
-    
-    aceSection = localStorage.getItem('aceSection');
-    statusContent = $('#status');
-
-    aceSection = {
-      name: '',
-      content: ''
-    };
-    statusContent = $('#status');
-
-
-
-    _GlobalFiles = [];
-refreshFileList = function(callback)
-{
-  cb = callback;
-  _GlobalFiles=[];
-  cd('/').for('*',function(done,file) { 
-      _GlobalFiles.push(file);
-  }).then(function(){
-    console.log('_GlobalFiles:', _GlobalFiles)
-      if(cb && typeof cb == 'function')
-      {
-        cb();
-      }
-  })
-}
-
-  setTimeout(function(){
-      refreshFileList(function(){
-            if(_GlobalFiles.length < 1)
-            {
-                createFile();
-            }
-            else
-            {
-                selectFile();
-            }
-      });
-
-    },2000)
-    //Busco los archivos creados y los meto en un array
-
-
-
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000)
-             .toString(16)
-             .substring(1);
-};
-
-
-
-
-/*
-   
-
-  }
-  */
-
-  /* Methods */
-
-createFile = function()
-{
-      
-
-      $('#myModal').foundation('reveal', 'open'); 
-
-      $('#createFile').click(function(){
-          // SI es un archivo sin nombre que se inenta guardar no le borro el contenido
-          if(aceSection.name == '' && aceSection.content != '');
-          {
-              aceSection.content = '';
-          }
-        
-          aceSection.name = $('#newFileInput').val();
-        
-          cd('/').write(aceSection.name ,aceSection.content);
-          e.setValue(aceSection.content);
-
-          $('#myModal').foundation('reveal', 'close'); 
-      });
-
-}
-
-selectFile = function()
-{
-     
-      if(_GlobalFiles && _GlobalFiles.length > 0)
-      {
-
-         $('#fileList > #list').html('');
-      
-        $.each(_GlobalFiles, function(){
-
-          var uid= s4();
-
-          $('#fileList > #list').append('<li class="panel">'+
-            '<a class="openFile" name="'+this.name+'" title="Abrir y editar ' + this.name + '">'+
-              '<h4>'+ this.name +'</h4>'+
-            '</a>'+
-            '<ul class="button-group round ">'+
-              '<li><a href="#"  name="'+this.name+'" class="small button openFile">Seleccionar</a></li>'+
-              '<li><a href="#" class="small button alert deleteFile" name="'+this.name+'" data-tooltip class="has-tip tip-right" title="Eliminar archivo">&#215;</a></li>'+
-            '</ul>'+
-            '<div id="drop'+uid+'" class="f-dropdown tiny content" data-dropdown-content>'+
-                '<h5>¿Seguro?<h5>'+
-                  '<ul class="button-group tiny">'+
-                      '<li><a href="#" class="button tiny secondary close-dropdown">Cancelar</a></li>'+
-                      '<li><a href="#" class="button tiny deleteFile" name="'+this.name+'">Eliminarlo</a></li>'+
-                  '</ul>'+
-            '</div>'+
-            '<a class="close-reveal-modal">&#215;</a>'+
-          '</li>');
-        })
-
-
-
-
-        $('#fileList').foundation('reveal', 'open');
-        $('.openFile').click(function(){
-
-          aceSection.name = $(this).attr('name');
-          cd('/').read( $(this).attr('name'), function(done,res) { 
-            //this
-           // .echo(res)
-           // .write('report.txt', 'bar.txt contains '+res);
-           aceSection.content = res;
-              e.setValue(aceSection.content);
-              $('#fileList').foundation('reveal', 'close');
-
-          })
-
-        })
-
-      }
-      else
-      {
-        createFile();
-      }
-}
-
-
-  save = function(){ 
-
-      aceSection.content = e.getValue();
-
-      if(!aceSection.name || aceSection.name == "")
-      {
-          createFile();
-      }
-      else
-      {
-          statusContent.text('Guardando...')
-          statusContent.removeClass('success');
-
-          try {
-              //localStorage.setItem('aceSection', e.getValue());
-            cd('/').write(aceSection.name,aceSection.content).then(function(){
-
-                      statusContent.text('Guardado')
-                      statusContent.addClass('success');
-            });
-
-          } catch(e) {
-            if(e.name === 'QUOTA_EXCEEDED_ERR') {
-                statusContent.text('No hay mas espacio para guardar')
-                statusContent.addClass('error');
-            } else {
-              module.localStorageAvailable = false;
-              statusContent.text('NO SE PUEDE GUARDAR')
-              console.error("Error al guardar en local storage - " + e);
-            }
-          }
-
-      }
-
-      
-
-
-  };
-
-
-
-
-  /* Event bind */
-
-  e.getSession().on('change', function(){
-      statusContent.text('Sin guardar');
-      save();
-  });
-
-  $('#save').click(function(){
-    save();
-
-    var blob = new Blob([aceSection.content], {type: "text/plain;charset=utf-8"});
-    //var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
-    //TODO: Detectar el tipo de archivo.
-    saveAs(blob, aceSection.name);
-  })
-
-  $('#undo').click(function(){
-      e.undo();
-  })
-
-  $('#redo').click(function(){
-      e.redo();
-  })
-  
-
-  $('#new').click(function(){
-      createFile();
-  })
-
-  $('#select').click(function(){
-      refreshFileList(selectFile);
-  })
-
-  $('body').on('click','.deleteFile', function(){
-        
-        if(confirm('¿Lo eliminamos?'))
-        {
-          cd('/').rm( $(this).attr('name'), function(done,res) {
-             alert('Fallo la eliminación del archivo');
-          }).then(function(){
-              refreshFileList(selectFile);
-          })
-        }
-        
-  });
-
-
-
-  $('body').on('click','.close-dropdown', function(){
-        
-        $('.open').closed();
-
-  });
-
-
-
-  $('#languageSelect').change(function(){
-    e.getSession().setMode("ace/mode/"+$(this).val());
-  })
-
-});
-
-
-</script>
 
   <script>
   document.write('<script src=' +

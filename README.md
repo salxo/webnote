@@ -1,6 +1,17 @@
-﻿WebNote | Version 0.6 (BETA)
+﻿WebNote | Version 0.7 (BETA)
 ================================
 Una simple pero poderosa aplicación para la edición de archivos JavaScript, HTML, CSS, Ruby, etc..  de tu navegador.
+
+
+V 0.7 (BETA) Caracteristicas:
+-------------------------
+Tecnicas:
+- Implementado con AngularJs.
+- Separación de Scritps.
+- Uso de ACE.js como libreria local.
+
+Visuales:
+- 
 
 
 V 0.6 (BETA) Caracteristicas:
