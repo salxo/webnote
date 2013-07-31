@@ -11,6 +11,27 @@ var wn = function($scope)
       "class": ""
     };
 
+    $scope.languajesHighlight = [
+      {
+        "name": "CSS",
+        "value": "css"
+      },
+      {
+        "name": "JavaScript",
+        "value": "javascript"
+      },
+      {
+        "name": "JSON",
+        "value": "json"
+      },
+      {
+        "name": "HTML",
+        "value": "html"
+      },
+    ];
+
+    $scope.actualLanguage = $scope.languajesHighlight[1];
+
     $scope.actualFile = {
       "name": "",
       "content": ""
@@ -18,6 +39,14 @@ var wn = function($scope)
 
 
     $scope.newFileName  = 'newfile-'+ new Date().getTime();
+
+    
+
+    $scope.languageSwitch = function(){
+      $scope.editor.getSession().setMode("ace/mode/"+$scope.actualLanguage.name);
+    };
+
+
 
     $scope.refreshFileList = function(callback)
     {
@@ -159,40 +188,3 @@ var wn = function($scope)
 
 };
 
-
-
-$(document).ready(
-  function(){
-    var e,
-    aceSection,
-    statusContent;
-/*
-    e=ace.edit("e");
-    e.setTheme("ace/theme/monokai");
-    e.getSession().setMode("ace/mode/javascript");
-
-  */ 
-    //Busco los archivos creados y los meto en un array
-
-
-
-
-
-  /* Event bind */
-
-
-  $('#save').click(function(){
-    save();
-
-    var blob = new Blob([aceSection.content], {type: "text/plain;charset=utf-8"});
-    //var fileName = prompt('Nombre para el archivo (EJ: miarchivo.js)');
-    //TODO: Detectar el tipo de archivo.
-    saveAs(blob, aceSection.name);
-  });
-
-  $('#languageSelect').change(function(){
-    e.getSession().setMode("ace/mode/"+$(this).val());
-  });
-
-
-});

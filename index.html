@@ -96,15 +96,9 @@
       <li class="has-form">
         <form>
           <div class="row collapse">
-          <label for="languageSelect">Lenguaje</label>
-          <select id="languageSelect">
-            <option value="javascript">Javascript</option>
-            <option value="css">CSS</option>
-            <option value="html">HTML</option>
-            <option value="ruby">Ruby</option>
-            <option value="sql">SQL</option>
-            <option value="text">Texto</option>
-          </select>
+          <select ng-change="languageSwitch()" 
+                  ng-model="actualLanguage" 
+                  ng-options="c.name for c in languajesHighlight"></select>
           </div>
         </form>
       </li>
