@@ -11,7 +11,6 @@ Tecnicas:
 - Uso de ACE.js como libreria local.
 
 Visuales:
-- 
 
 
 V 0.6 (BETA) Caracteristicas:
